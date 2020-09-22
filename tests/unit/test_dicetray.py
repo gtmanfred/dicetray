@@ -6,6 +6,7 @@ import dicetray
 @pytest.mark.parametrize(
     "formula,num_dice",
     [
+        ("1d20", 1),
         ("1d20 + 1", 1),
         ("1d20 + 1df - 1", 2),
         ("(1d20 + 2d8) * 2", 3),

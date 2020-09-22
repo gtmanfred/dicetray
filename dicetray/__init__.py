@@ -123,7 +123,7 @@ class Dicetray:
 
     def roll(self):
         equation = parse(self.statement)
-        self.result = self.solve(equation)
+        self.result = self._sum(self.solve(equation))
         if isinstance(self.result, Dice):
             self.result = self.result.result
         return self.result
