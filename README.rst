@@ -17,9 +17,7 @@ Dicetray
     :target: https://pypi.org/project/dicetray/
 
 
-Tabletop RPG Dice rolling manager.
-
-This library uses system random generator in order to have truely random dice rolls.
+Tabletop RPG Dice rolling manager for handling `Standard Dice Notation`_
 
 Example
 -------
@@ -43,3 +41,5 @@ Example
     {<Dice (d20): 14>, <Dice (d20): 14>, <Dice (d4): 1>}
     >>> d.result
     18
+
+.. _Standard Dice Notation: https://en.wikipedia.org/wiki/Dice_notation
