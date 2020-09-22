@@ -22,7 +22,7 @@ class DiceLexer(sly.Lexer):
     ignore = " \t"
 
     NUMBER = r"[0-9]+"
-    DICE = r"d[0-9fF]+"
+    DICE = r"d[0-9fF%]+"
     LPAREN = r"\("
     RPAREN = r"\)"
     PLUS = r"\+"

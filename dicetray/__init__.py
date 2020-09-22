@@ -123,6 +123,8 @@ class Dicetray:
             for _ in range(equation[1]):
                 if isinstance(equation[2], str) and equation[2].lower() == "f":
                     dice.append(FateDice())
+                elif isinstance(equation[2], str) and equation[2] == '%':
+                    dice.append(Dice(sides=100))
                 else:
                     dice.append(Dice(sides=equation[2]))
                 self.dice.update(dice)
@@ -151,9 +153,11 @@ class Dicetray:
 
     def _divide(self, expr1, expr2):
         one = self.solve(expr1)
+        if isinstance(one, list):
+            one = self._sum(one)
         if isinstance(one, Dice):
             one = one.result
-        return self._sum(one) / self._sum(self.solve(expr2))
+        return one / self._sum(self.solve(expr2))
 
     def _keephigh(self, count, expr):
         return self._sum(sorted(self.solve(expr), reverse=True)[:count])
