@@ -19,6 +19,14 @@ class Dice:
         self.sides = sides or 0
         self.result = self.roll() if result is None else result
 
+    def __dict__(self):
+        return {
+            'result': self.result,
+            'sides': self.sides,
+            'ismin': self.ismin,
+            'ismax': self.ismax,
+        }
+
     def __repr__(self):
         return f"<Dice (d{self.sides}): {self.result}>"
 

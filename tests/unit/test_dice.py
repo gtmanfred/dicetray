@@ -76,3 +76,20 @@ def test_dice_compare_eq():
 
 def test_dice_str():
     assert str(dicetray.Dice(sides=20, result=10)) == "<Dice (d20): 10>"
+
+
+@pytest.mark.parametrize(
+    'sides,result,ismin,ismax', [
+        (20, 10, False, False),
+        (6, 1, True, False),
+        (12, 12, False, True),
+        (1, 1, True, True),
+        (10, 9, False, False),
+    ],
+)
+def test_dice_dict(sides, result, ismin, ismax):
+    dice = dicetray.Dice(sides=sides, result=result).__dict__()
+    assert dice['sides'] == sides
+    assert dice['result'] == result
+    assert dice['ismin'] == ismin
+    assert dice['ismax'] == ismax
