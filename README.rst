@@ -1,5 +1,5 @@
 Dicetray
-======
+========
 
 .. image:: https://github.com/gtmanfred/dicetray/workflows/Tests/badge.svg
     :target: https://github.com/gtmanfred/dicetray
@@ -24,7 +24,7 @@ This library uses system random generator in order to have truely random dice ro
 Example
 -------
 
-.. code-block:: py
+.. code-block:: python
 
     >>> from dicetray import Dicetray
     >>> Dicetray('1d20 + 3').roll()
