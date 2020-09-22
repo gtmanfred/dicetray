@@ -6,7 +6,7 @@ from .parser import parse
 
 try:
     random = random.SystemRandom()
-except NotImplementedError:
+except NotImplementedError:  # pragma: nocover
     import warnings
     warnings.warning(
         'System random number generator is not available. Falling back to pseudo-random generator'
