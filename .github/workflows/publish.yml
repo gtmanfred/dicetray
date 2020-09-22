@@ -1,4 +1,4 @@
-name: Figenv Release Publish
+name: Dicetray Release Publish
 
 on:
   push:
