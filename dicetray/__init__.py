@@ -78,7 +78,7 @@ class FateDice(Dice):
         """
         Roll dice
         """
-        return random.randint(-1, 1)
+        return (struct.unpack("I", os.urandom(4))[0] % 3) - 1
 
     @property
     def ismax(self):
