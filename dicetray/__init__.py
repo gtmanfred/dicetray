@@ -1,9 +1,17 @@
 import os
 import random
-import struct
 import typing
 
 from .parser import parse
+
+try:
+    random = random.SystemRandom()
+except NotImplementedError:
+    import warnings
+    warnings.warning(
+        'System random number generator is not available. Falling back to pseudo-random generator'
+    )
+
 
 
 class Dice:
@@ -26,7 +34,7 @@ class Dice:
         """
         if self.sides == 0:
             return 0
-        return (struct.unpack("I", os.urandom(4))[0] % self.sides) + 1
+        return random.randint(1, self.sides)
 
     @staticmethod
     def _handle_int(other):
@@ -78,7 +86,7 @@ class FateDice(Dice):
         """
         Roll dice
         """
-        return (struct.unpack("I", os.urandom(4))[0] % 3) - 1
+        return random.randint(-1, 1)
 
     @property
     def ismax(self):
