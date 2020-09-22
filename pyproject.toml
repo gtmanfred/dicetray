@@ -3,6 +3,7 @@ name = "dicetray"
 version = "0.1.1"
 description = "Tabletop RPG Dice roller"
 authors = ["Daniel Wallace <danielwallace@gtmanfred.com>"]
+repository = "https://github.com/gtmanfred/dicetray.git"
 license = "Apache-2.0"
 
 [tool.poetry.dependencies]

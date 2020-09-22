@@ -28,24 +28,30 @@ class Dice:
             return 0
         return (struct.unpack("I", os.urandom(4))[0] % self.sides) + 1
 
-    def __add__(self, other):
+    @staticmethod
+    def _handle_int(other):
         if not isinstance(other, int):
             other = other.result
+        return other
+
+    def __add__(self, other):
+        other = self._handle_int(other)
         return Dice(sides=0, result=self.result + other)
 
     def __sub__(self, other):
-        if not isinstance(other, int):
-            other = other.result
+        other = self._handle_int(other)
         return Dice(sides=0, result=self.result - other)
 
     def __eq__(self, other):
-        if not isinstance(other, int):
-            other = other.result
+        other = self._handle_int(other)
         return self.result == other
 
+    def __mul__(self, other):
+        other = self._handle_int(other)
+        return self.result * other
+
     def __lt__(self, other):
-        if not isinstance(other, int):
-            other = other.result
+        other = self._handle_int(other)
         return self.result < other
 
     @property
@@ -128,7 +134,7 @@ class Dicetray:
         if isinstance(expr, (int, float)):
             return expr
         if isinstance(expr, Dice):
-            return expr.result
+            return expr
         ret = 0
         for item in expr:
             ret = item + ret
@@ -144,7 +150,10 @@ class Dicetray:
         return self._sum(self.solve(expr1)) * self._sum(self.solve(expr2))
 
     def _divide(self, expr1, expr2):
-        return self._sum(self.solve(expr1)) / self._sum(self.solve(expr2))
+        one = self.solve(expr1)
+        if isinstance(one, Dice):
+            one = one.result
+        return self._sum(one) / self._sum(self.solve(expr2))
 
     def _keephigh(self, count, expr):
         return self._sum(sorted(self.solve(expr), reverse=True)[:count])

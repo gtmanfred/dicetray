@@ -10,10 +10,15 @@ import dicetray
         ("1d20 + 1df - 1", 2),
         ("(1d20 + 2d8) * 2", 3),
         ("(1d20 + 2d8) / 1", 3),
-        ("2d20kh1", 2),
+        ("1/1", 0),
+        ("2d20kh4", 2),
         ("4d6dl1", 4),
-        ("2d20dh1", 2),
-        ("4d6kl1", 4),
+        ("2d20dh2", 2),
+        ("4d6kl3", 4),
+        ("4d6dl", 4),
+        ("2d20dh", 2),
+        ("4d6kl", 4),
+        ("2d20kh + 1d4 + 3", 3),
     ],
 )
 def test_dicetray_formulas(formula, num_dice):

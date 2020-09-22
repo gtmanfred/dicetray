@@ -72,6 +72,22 @@ class DiceParser(sly.Parser):
     def expr(self, p):
         return ("DROPLOW", int(p.NUMBER1), self._dice(p.NUMBER0, p.DICE))
 
+    @_("NUMBER DICE KEEPHIGH")
+    def expr(self, p):
+        return ("KEEPHIGH", 1, self._dice(p.NUMBER, p.DICE))
+
+    @_("NUMBER DICE KEEPLOW")
+    def expr(self, p):
+        return ("KEEPLOW", 1, self._dice(p.NUMBER, p.DICE))
+
+    @_("NUMBER DICE DROPHIGH")
+    def expr(self, p):
+        return ("DROPHIGH", 1, self._dice(p.NUMBER, p.DICE))
+
+    @_("NUMBER DICE DROPLOW")
+    def expr(self, p):
+        return ("DROPLOW", 1, self._dice(p.NUMBER, p.DICE))
+
 
 def parse(expr):
     return DiceParser().parse(tokens=DiceLexer().tokenize(text=expr))
