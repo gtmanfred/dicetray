@@ -140,6 +140,12 @@ class Dicetray:
         self.result = self._sum(self.solve(equation))
         return self.result
 
+    @staticmethod
+    def _highlight(die, markdown):
+        if markdown is False:
+            return False
+        return die.ismax or die.ismin
+
     def format(self, verbose=False, markdown=False, tree=None):
         """
         Format dice formula output
@@ -153,16 +159,31 @@ class Dicetray:
         if 'NUMBER' in tree:
             equation = str(tree['NUMBER'])
         elif 'KEEP' in tree:
-            kept = str([die.formatted(markdown) for die in tree['KEEP']])
-            dropped = str([die.formatted(markdown) for die in tree['DROP']])
+            kept = ', '.join([
+                f'**{die.result}**'
+                if self._highlight(die, markdown)
+                else str(die.result)
+                for die in tree['KEEP']
+            ])
+            dropped = ', '.join([
+                f'**{die.result}**'
+                if self._highlight(die, markdown)
+                else str(die.result)
+                for die in tree['DROP']
+            ])
             if verbose is True:
-                equation = f'{tree["FRAGMENT"]}(scores:{kept}, dropped:{dropped})'
+                equation = f'{tree["FRAGMENT"]}(scores:[{kept}], dropped:[{dropped}])'
             else:
                 equation = kept
         elif 'DICE' in tree:
-            dice = str([die.formatted(markdown) for die in tree['DICE']])
+            dice = ', '.join([
+                f'**{die.result}**'
+                if self._highlight(die, markdown)
+                else str(die.result)
+                for die in tree['DICE']
+            ])
             if verbose is True:
-                equation = f'{tree["FRAGMENT"]}(scores:{dice})'
+                equation = f'{tree["FRAGMENT"]}(scores:[{dice}])'
             else:
                 equation = dice
         else:
