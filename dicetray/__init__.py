@@ -34,6 +34,11 @@ class Dice:
     def __hash__(self):
         return hash(id(self))
 
+    def formatted(self, markdown=False):
+        if markdown is True and any([self.ismax, self.ismin]):
+            return f'**{self.result}**'
+        return str(self.result)
+
     def roll(self):
         """
         Roll dice
@@ -135,7 +140,7 @@ class Dicetray:
         self.result = self._sum(self.solve(equation))
         return self.result
 
-    def format(self, verbose=False, tree=None):
+    def format(self, verbose=False, markdown=False, tree=None):
         """
         Format dice formula output
 
@@ -148,14 +153,14 @@ class Dicetray:
         if 'NUMBER' in tree:
             equation = str(tree['NUMBER'])
         elif 'KEEP' in tree:
-            kept = str([die.result for die in tree['KEEP']])
-            dropped = str([die.result for die in tree['DROP']])
+            kept = str([die.formatted(markdown) for die in tree['KEEP']])
+            dropped = str([die.formatted(markdown) for die in tree['DROP']])
             if verbose is True:
                 equation = f'{tree["FRAGMENT"]}(scores:{kept}, dropped:{dropped})'
             else:
                 equation = kept
         elif 'DICE' in tree:
-            dice = str([die.result for die in tree['DICE']])
+            dice = str([die.formatted(markdown) for die in tree['DICE']])
             if verbose is True:
                 equation = f'{tree["FRAGMENT"]}(scores:{dice})'
             else:
