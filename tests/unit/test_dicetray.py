@@ -30,5 +30,7 @@ def test_dicetray_formulas(formula, num_dice):
     assert tray.result is None
     assert not tray.dice
     tray.roll()
+    assert isinstance(tray.format(), str)
+    assert isinstance(tray.format(verbose=True), str)
     assert isinstance(tray.result, (int, float))
     assert len(tray.dice) == num_dice

@@ -1,3 +1,4 @@
+import collections
 import os
 import random
 import typing
@@ -62,10 +63,6 @@ class Dice:
         other = self._handle_int(other)
         return self.result == other
 
-    def __mul__(self, other):
-        other = self._handle_int(other)
-        return self.result * other
-
     def __lt__(self, other):
         other = self._handle_int(other)
         return self.result < other
@@ -111,6 +108,17 @@ class FateDice(Dice):
         return self.result == -1
 
 
+class Diceset(list):
+    def __init__(self, sides, count=1):
+        for _ in range(count):
+            if isinstance(sides, str) and sides.lower() == "f":
+                self.append(FateDice())
+            elif isinstance(sides, str) and sides == '%':
+                self.append(Dice(sides=100))
+            else:
+                self.append(Dice(sides=sides))
+
+
 class Dicetray:
     dice: typing.List[Dice]
     result: int
@@ -120,69 +128,150 @@ class Dicetray:
         self.statement = statement
         self.dice = set()
         self.result = None
+        self._tree = {}
 
     def roll(self):
         equation = parse(self.statement)
         self.result = self._sum(self.solve(equation))
-        if isinstance(self.result, Dice):
-            self.result = self.result.result
         return self.result
 
-    def solve(self, equation):
+    def format(self, verbose=False, tree=None):
+        """
+        Format dice formula output
+
+        .. note:: Do not pass anything to ``tree``
+        """
+        if tree is None:
+            tree = self._tree
+        equation = None
+
+        if 'NUMBER' in tree:
+            equation = str(tree['NUMBER'])
+        elif 'KEEP' in tree:
+            kept = str([die.result for die in tree['KEEP']])
+            dropped = str([die.result for die in tree['DROP']])
+            if verbose is True:
+                equation = f'{tree["FRAGMENT"]}(scores:{kept}, dropped:{dropped})'
+            else:
+                equation = kept
+        elif 'DICE' in tree:
+            dice = str([die.result for die in tree['DICE']])
+            if verbose is True:
+                equation = f'{tree["FRAGMENT"]}(scores:{dice})'
+            else:
+                equation = dice
+        else:
+            operations = [
+                ('PLUS', '+'),
+                ('MINUS', '-'),
+                ('TIMES', '*'),
+                ('DIVIDE', '/'),
+            ]
+
+            for oper, symbol in operations:  # pragma: nocover
+                if oper in tree:
+                    equation = (
+                        f'{self.format(verbose=verbose, tree=tree[oper]["LEFT"])}'
+                        f' {symbol} '
+                        f'{self.format(verbose=verbose, tree=tree[oper]["RIGHT"])}'
+                    )
+                    break
+
+        return equation
+
+    def solve(self, equation, tree=None):
         """
         Recursively solve the equation for dice rolls
         """
+        if tree is None:
+            tree = self._tree
         if equation[0] == "NUMBER":
-            return equation[1]
+            number = equation[1]
+            tree['FRAGMENT'] = number
+            tree['RESULT'] = number
+            tree['NUMBER'] = number
+            return number
         if equation[0] == "DICE":
-            dice = []
-            for _ in range(equation[1]):
-                if isinstance(equation[2], str) and equation[2].lower() == "f":
-                    dice.append(FateDice())
-                elif isinstance(equation[2], str) and equation[2] == '%':
-                    dice.append(Dice(sides=100))
-                else:
-                    dice.append(Dice(sides=equation[2]))
-                self.dice.update(dice)
-            return dice
+            tree['FRAGMENT'] = f'{equation[1]}d{equation[2]}'
+            diceset = Diceset(*equation[2:0:-1])
+            tree['DICE'] = diceset
+            self.dice.update(diceset)
+            return diceset
         func = equation[0].lower()
-        return getattr(self, f"_{func}")(*equation[1:])
+        return getattr(self, f"_{func}")(*equation[1:], tree=tree)
 
     def _sum(self, expr):
         if isinstance(expr, (int, float)):
             return expr
-        if isinstance(expr, Dice):
-            return expr
-        ret = 0
-        for item in expr:
-            ret = item + ret
-        return ret
+        return sum(expr, start=Dice(result=0)).result
 
-    def _plus(self, expr1, expr2):
-        return self._sum(self.solve(expr1)) + self._sum(self.solve(expr2))
+    def _plus(self, expr1, expr2, tree):
+        left = self.solve(expr1, tree.setdefault('PLUS', {}).setdefault('LEFT', {}))
+        right = self.solve(expr2, tree.setdefault('PLUS', {}).setdefault('RIGHT', {}))
+        leftsum = tree['PLUS']['LEFT']['RESULT'] = self._sum(left)
+        rightsum = tree['PLUS']['RIGHT']['RESULT'] = self._sum(right)
 
-    def _minus(self, expr1, expr2):
-        return self._sum(self.solve(expr1)) - self._sum(self.solve(expr2))
+        result = tree['PLUS']['RESULT'] = leftsum + rightsum
+        return result
 
-    def _times(self, expr1, expr2):
-        return self._sum(self.solve(expr1)) * self._sum(self.solve(expr2))
+    def _minus(self, expr1, expr2, tree):
+        left = self.solve(expr1, tree.setdefault('MINUS', {}).setdefault('LEFT', {}))
+        right = self.solve(expr2, tree.setdefault('MINUS', {}).setdefault('RIGHT', {}))
+        leftsum = tree['MINUS']['LEFT']['RESULT'] = self._sum(left)
+        rightsum = tree['MINUS']['RIGHT']['RESULT'] = self._sum(right)
 
-    def _divide(self, expr1, expr2):
-        one = self.solve(expr1)
-        if isinstance(one, list):
-            one = self._sum(one)
-        if isinstance(one, Dice):
-            one = one.result
-        return one / self._sum(self.solve(expr2))
+        result = tree['MINUS']['RESULT'] = leftsum - rightsum
+        return result
 
-    def _keephigh(self, count, expr):
-        return self._sum(sorted(self.solve(expr), reverse=True)[:count])
+    def _times(self, expr1, expr2, tree):
+        left = self.solve(expr1, tree.setdefault('TIMES', {}).setdefault('LEFT', {}))
+        right = self.solve(expr2, tree.setdefault('TIMES', {}).setdefault('RIGHT', {}))
+        leftsum = tree['TIMES']['LEFT']['RESULT'] = self._sum(left)
+        rightsum = tree['TIMES']['RIGHT']['RESULT'] = self._sum(right)
 
-    def _keeplow(self, count, expr):
-        return self._sum(sorted(self.solve(expr))[:count])
+        result = tree['TIMES']['RESULT'] = leftsum * rightsum
+        return result
 
-    def _drophigh(self, count, expr):
-        return self._sum(sorted(self.solve(expr), reverse=True)[count:])
+    def _divide(self, expr1, expr2, tree):
+        left = self.solve(expr1, tree.setdefault('DIVIDE', {}).setdefault('LEFT', {}))
+        right = self.solve(expr2, tree.setdefault('DIVIDE', {}).setdefault('RIGHT', {}))
+        if isinstance(left, list):
+            left = self._sum(left)
+        right = self.solve(expr2, tree.setdefault('DIVIDE', {}).setdefault('RIGHT', {}))
+        leftsum = tree['DIVIDE']['LEFT']['RESULT'] = left
+        rightsum = tree['DIVIDE']['RIGHT']['RESULT'] = self._sum(right)
 
-    def _droplow(self, count, expr):
-        return self._sum(sorted(self.solve(expr))[count:])
+        result = tree['DIVIDE']['RESULT'] = leftsum / rightsum
+        return result
+
+    def _keephigh(self, count, expr, tree):
+        dice = sorted(self.solve(expr, tree=tree))
+        tree['DROP'], tree['KEEP'] = dice[:count], dice[count:]
+
+        result = tree['RESULT'] = self._sum(tree['KEEP'])
+        tree['FRAGMENT'] = f'{tree["FRAGMENT"]}kh{count}'
+        return result
+
+    def _keeplow(self, count, expr, tree):
+        dice = sorted(self.solve(expr, tree=tree))
+        tree['DROP'], tree['KEEP'] = dice[count:], dice[:count]
+
+        result = tree['RESULT'] = self._sum(tree['KEEP'])
+        tree['FRAGMENT'] = f'{tree["FRAGMENT"]}kl{count}'
+        return result
+
+    def _drophigh(self, count, expr, tree):
+        dice = sorted(self.solve(expr, tree=tree))
+        tree['DROP'], tree['KEEP'] = dice[count:], dice[:count]
+
+        result = tree['RESULT'] = self._sum(tree['KEEP'])
+        tree['FRAGMENT'] = f'{tree["FRAGMENT"]}dh{count}'
+        return result
+
+    def _droplow(self, count, expr, tree):
+        dice = sorted(self.solve(expr, tree=tree))
+        tree['DROP'], tree['KEEP'] = dice[:count], dice[count:]
+
+        result = tree['RESULT'] = self._sum(tree['KEEP'])
+        tree['FRAGMENT'] = f'{tree["FRAGMENT"]}dl{count}'
+        return result
