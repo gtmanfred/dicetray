@@ -6,6 +6,8 @@ import sly
 class DiceLexer(sly.Lexer):
 
     tokens = {
+        NUMBER,
+        TYPE,
         LPAREN,
         RPAREN,
         PLUS,
@@ -16,12 +18,12 @@ class DiceLexer(sly.Lexer):
         KEEPLOW,
         DROPHIGH,
         DROPLOW,
-        NUMBER,
-        TYPE,
         DIE,
     }
     ignore = " \t"
 
+    NUMBER = r"[0-9]+"
+    TYPE = r"[fF%]"
     LPAREN = r"\("
     RPAREN = r"\)"
     PLUS = r"\+"
@@ -32,6 +34,4 @@ class DiceLexer(sly.Lexer):
     KEEPLOW = r"kl"
     DROPHIGH = r"dh"
     DROPLOW = r"dl"
-    NUMBER = r"[0-9]+"
-    TYPE = r"[fF%]"
     DIE = r"d"

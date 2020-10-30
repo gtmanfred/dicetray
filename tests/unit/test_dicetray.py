@@ -1,6 +1,7 @@
 import pytest
 
-import dicetray
+import dicetray.parser
+import sly.lex
 
 
 @pytest.mark.parametrize(
@@ -48,3 +49,15 @@ def test_dicetray_maxdice_exception(formula, max_dice):
             dicetray.Dicetray(formula).roll()
         else:
             dicetray.Dicetray(formula, max_dice=max_dice).roll()
+
+
+@pytest.mark.parametrize(
+    'formula', [
+        ('1d20+'),
+        ('1d10+-'),
+        ('1dfF%20'),
+    ],
+)
+def test_dicetray_parsing_exception(formula):
+    with pytest.raises(dicetray.parser.ParserError):
+        dicetray.Dicetray(formula).roll()

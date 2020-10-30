@@ -5,6 +5,10 @@ import sly
 from .lexer import DiceLexer
 
 
+class ParserError(Exception):
+    ...
+
+
 class DiceParser(sly.Parser):
     tokens = DiceLexer.tokens
 
@@ -12,26 +16,26 @@ class DiceParser(sly.Parser):
         ("left", PLUS, MINUS),
         ("left", TIMES, DIVIDE),
     )
+    ops = {
+        '+': 'PLUS',
+        '-': 'MINUS',
+        '*': 'TIMES',
+        '/': 'DIVIDE',
+    }
+
+    def error(self, p):
+        raise ParserError('Unable to parse statement')
 
     @_("statement")
     def statements(self, p):
         return p.statement
 
-    @_("expr PLUS expr")
+    @_("expr PLUS expr",
+       "expr MINUS expr",
+       "expr TIMES expr",
+       "expr DIVIDE expr")
     def expr(self, p):
-        return ("PLUS", p.expr0, p.expr1)
-
-    @_("expr MINUS expr")
-    def expr(self, p):
-        return ("MINUS", p.expr0, p.expr1)
-
-    @_("expr TIMES expr")
-    def expr(self, p):
-        return ("TIMES", p.expr0, p.expr1)
-
-    @_("expr DIVIDE expr")
-    def expr(self, p):
-        return ("DIVIDE", p.expr0, p.expr1)
+        return (self.ops[p[1]], p.expr0, p.expr1)
 
     @_("LPAREN expr RPAREN")
     def expr(self, p):
