@@ -31,28 +31,30 @@ Below is the grammer that is used by the parser generator to intepret inputs.
               | expr DIVIDE expr
 
     expr : NUMBER
-         | DICE
-         | NUMBER DICE
-         | NUMBER DICE KEEPHIGH
-         | NUMBER DICE KEEPLOW
-         | NUMBER DICE DROPHIGH
-         | NUMBER DICE DROPLOW
-         | NUMBER DICE KEEPHIGH NUMBER
-         | NUMBER DICE KEEPLOW NUMBER
-         | NUMBER DICE DROPHIGH NUMBER
-         | NUMBER DICE DROPLOW NUMBER
+         | dice
+         | func
+
+    func : dice
+         | dice KEEPHIGH
+         | dice KEEPLOW
+         | dice DROPHIGH
+         | dice DROPLOW
+         | dice KEEPHIGH NUMBER
+         | dice KEEPLOW NUMBER
+         | dice DROPHIGH NUMBER
+         | dice DROPLOW NUMBER
+
+    dice : NUMBER DIE NUMBER
+         | NUMBER DIE TYPE
 
     PLUS : +
     MINUS : -
     TIMES : *
-          | x
     DIVIDE : /
-           | %
 
     NUMBER: [0-9]+
     TYPE: [fF%]
-    DICE : NUMBER d NUMBER
-         | NUMBER d TYPE
+    DIE : d
     KEEPHIGH: kh
     KEEPLOW: kl
     DROPHIGH: dh

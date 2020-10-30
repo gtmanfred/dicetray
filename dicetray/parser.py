@@ -45,48 +45,53 @@ class DiceParser(sly.Parser):
     def expr(self, p):
         return ("NUMBER", int(p.NUMBER))
 
-    @staticmethod
-    def _dice(number, dice):
-        die_size = dice[1:]
-        if die_size.isdigit() is True:
-            die_size = int(die_size)
-        return ("DICE", int(number), die_size)
-
-    @_("NUMBER DICE")
+    @_("dice")
     def expr(self, p):
-        return self._dice(p.NUMBER, p.DICE)
+        return p.dice
 
-    @_("NUMBER DICE KEEPHIGH NUMBER")
+    @_("func")
     def expr(self, p):
-        return ("KEEPHIGH", int(p.NUMBER1), self._dice(p.NUMBER0, p.DICE))
+        return p.func
 
-    @_("NUMBER DICE KEEPLOW NUMBER")
-    def expr(self, p):
-        return ("KEEPLOW", int(p.NUMBER1), self._dice(p.NUMBER0, p.DICE))
+    @_("NUMBER DIE TYPE")
+    def dice(self, p):
+        return ("DICE", int(p.NUMBER), p.TYPE)
 
-    @_("NUMBER DICE DROPHIGH NUMBER")
-    def expr(self, p):
-        return ("DROPHIGH", int(p.NUMBER1), self._dice(p.NUMBER0, p.DICE))
+    @_("NUMBER DIE NUMBER")
+    def dice(self, p):
+        return ("DICE", int(p.NUMBER0), int(p.NUMBER1))
 
-    @_("NUMBER DICE DROPLOW NUMBER")
-    def expr(self, p):
-        return ("DROPLOW", int(p.NUMBER1), self._dice(p.NUMBER0, p.DICE))
+    @_("dice KEEPHIGH")
+    def func(self, p):
+        return ("KEEPHIGH", 1, p.dice)
 
-    @_("NUMBER DICE KEEPHIGH")
-    def expr(self, p):
-        return ("KEEPHIGH", 1, self._dice(p.NUMBER, p.DICE))
+    @_("dice KEEPLOW")
+    def func(self, p):
+        return ("KEEPLOW", 1, p.dice)
 
-    @_("NUMBER DICE KEEPLOW")
-    def expr(self, p):
-        return ("KEEPLOW", 1, self._dice(p.NUMBER, p.DICE))
+    @_("dice DROPHIGH")
+    def func(self, p):
+        return ("DROPHIGH", 1, p.dice)
 
-    @_("NUMBER DICE DROPHIGH")
-    def expr(self, p):
-        return ("DROPHIGH", 1, self._dice(p.NUMBER, p.DICE))
+    @_("dice DROPLOW")
+    def func(self, p):
+        return ("DROPLOW", 1, p.dice)
 
-    @_("NUMBER DICE DROPLOW")
-    def expr(self, p):
-        return ("DROPLOW", 1, self._dice(p.NUMBER, p.DICE))
+    @_("dice KEEPHIGH NUMBER")
+    def func(self, p):
+        return ("KEEPHIGH", int(p.NUMBER), p.dice)
+
+    @_("dice KEEPLOW NUMBER")
+    def func(self, p):
+        return ("KEEPLOW", int(p.NUMBER), p.dice)
+
+    @_("dice DROPHIGH NUMBER")
+    def func(self, p):
+        return ("DROPHIGH", int(p.NUMBER), p.dice)
+
+    @_("dice DROPLOW NUMBER")
+    def func(self, p):
+        return ("DROPLOW", int(p.NUMBER), p.dice)
 
 
 def parse(expr):
