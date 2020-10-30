@@ -14,6 +14,9 @@ except NotImplementedError:  # pragma: nocover
     )
 
 
+class MaxDiceExceeded(Exception):
+    ...
+
 
 class Dice:
     def __init__(self, sides=None, result=None):
@@ -33,11 +36,6 @@ class Dice:
 
     def __hash__(self):
         return hash(id(self))
-
-    def formatted(self, markdown=False):
-        if markdown is True and any([self.ismax, self.ismin]):
-            return f'**{self.result}**'
-        return str(self.result)
 
     def roll(self):
         """
@@ -129,10 +127,11 @@ class Dicetray:
     result: int
     statement: str
 
-    def __init__(self, statement):
+    def __init__(self, statement, max_dice=1000):
         self.statement = statement
         self.dice = set()
         self.result = None
+        self.max_dice = max_dice
         self._tree = {}
 
     def roll(self):
@@ -219,7 +218,10 @@ class Dicetray:
             return number
         if equation[0] == "DICE":
             tree['FRAGMENT'] = f'{equation[1]}d{equation[2]}'
-            diceset = Diceset(*equation[2:0:-1])
+            count, sides = equation[1:]
+            if count + len(self.dice) > self.max_dice:
+                raise MaxDiceExceeded(f'Dice count too high: {count}>{self.max_dice}')
+            diceset = Diceset(sides=sides, count=count)
             tree['DICE'] = diceset
             self.dice.update(diceset)
             return diceset

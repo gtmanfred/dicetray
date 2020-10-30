@@ -31,6 +31,22 @@ def test_dicetray_formulas(formula, num_dice):
     assert not tray.dice
     tray.roll()
     assert isinstance(tray.format(), str)
-    assert isinstance(tray.format(verbose=True), str)
+    assert isinstance(tray.format(verbose=True, markdown=True), str)
     assert isinstance(tray.result, (int, float))
     assert len(tray.dice) == num_dice
+
+
+
+@pytest.mark.parametrize(
+    'formula,max_dice', [
+        ('100d20', 99),
+        ('1001d20', None),
+        ('50d20+100d6', 149),
+    ],
+)
+def test_dicetray_maxdice_exception(formula, max_dice):
+    with pytest.raises(dicetray.MaxDiceExceeded):
+        if max_dice is None:
+            dicetray.Dicetray(formula).roll()
+        else:
+            dicetray.Dicetray(formula, max_dice=max_dice).roll()
