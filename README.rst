@@ -19,6 +19,45 @@ Dicetray
 
 Tabletop RPG Dice rolling manager for handling `Standard Dice Notation`_
 
+Grammer
+-------
+
+Below is the grammer that is used by the parser generator to intepret inputs.
+
+    statement : expr
+              | expr PLUS expr
+              | expr MINUS expr
+              | expr TIMES expr
+              | expr DIVIDE expr
+
+    expr : NUMBER
+         | DICE
+         | NUMBER DICE
+         | NUMBER DICE KEEPHIGH
+         | NUMBER DICE KEEPLOW
+         | NUMBER DICE DROPHIGH
+         | NUMBER DICE DROPLOW
+         | NUMBER DICE KEEPHIGH NUMBER
+         | NUMBER DICE KEEPLOW NUMBER
+         | NUMBER DICE DROPHIGH NUMBER
+         | NUMBER DICE DROPLOW NUMBER
+
+    PLUS : +
+    MINUS : -
+    TIMES : *
+          | x
+    DIVIDE : /
+           | %
+
+    NUMBER: [0-9]+
+    TYPE: [fF%]
+    DICE : NUMBER d NUMBER
+         | NUMBER d TYPE
+    KEEPHIGH: kh
+    KEEPLOW: kl
+    DROPHIGH: dh
+    DROPLOW: dl
+
 Example
 -------
 
