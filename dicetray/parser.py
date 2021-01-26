@@ -61,6 +61,14 @@ class DiceParser(sly.Parser):
     def dice(self, p):
         return ("DICE", int(p.NUMBER), p.TYPE)
 
+    @_("DIE NUMBER")
+    def dice(self, p):
+        return ("DICE", 1, int(p.NUMBER))
+
+    @_("DIE TYPE")
+    def dice(self, p):
+        return ("DICE", 1, p.TYPE)
+
     @_("NUMBER DIE NUMBER")
     def dice(self, p):
         return ("DICE", int(p.NUMBER0), int(p.NUMBER1))

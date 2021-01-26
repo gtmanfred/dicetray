@@ -22,6 +22,8 @@ import sly.lex
         ("4d6kl", 4),
         ("2d20kh + 1d4 + 3", 3),
         ("1d% / 1", 1),
+        ("d6", 1),
+        ("df", 1),
     ],
 )
 def test_dicetray_formulas(formula, num_dice):
