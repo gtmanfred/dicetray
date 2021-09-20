@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "dicetray"
-version = "2.1.0"
+version = "2.1.1"
 description = "Tabletop RPG Dice roller"
 authors = ["Daniel Wallace <danielwallace@gtmanfred.com>"]
 repository = "https://github.com/gtmanfred/dicetray.git"
