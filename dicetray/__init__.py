@@ -273,8 +273,8 @@ class Dicetray:
         return result
 
     def _keephigh(self, count, expr, tree):
-        dice = sorted(self.solve(expr, tree=tree))
-        tree['DROP'], tree['KEEP'] = dice[:count], dice[count:]
+        dice = sorted(self.solve(expr, tree=tree), reverse=True)
+        tree['DROP'], tree['KEEP'] = dice[count:], dice[:count]
 
         result = tree['RESULT'] = self._sum(tree['KEEP'])
         tree['FRAGMENT'] = f'{tree["FRAGMENT"]}kh{count}'
@@ -289,8 +289,8 @@ class Dicetray:
         return result
 
     def _drophigh(self, count, expr, tree):
-        dice = sorted(self.solve(expr, tree=tree))
-        tree['DROP'], tree['KEEP'] = dice[count:], dice[:count]
+        dice = sorted(self.solve(expr, tree=tree), reverse=True)
+        tree['DROP'], tree['KEEP'] = dice[:count], dice[count:]
 
         result = tree['RESULT'] = self._sum(tree['KEEP'])
         tree['FRAGMENT'] = f'{tree["FRAGMENT"]}dh{count}'
