@@ -24,6 +24,8 @@ Grammer
 
 Below is the grammer that is used by the parser generator to intepret inputs.
 
+.. code-block::
+
     statement : expr
               | expr PLUS expr
               | expr MINUS expr
