@@ -23,7 +23,7 @@ sly = "^0.4"
 [tool.poetry.dev-dependencies]
 pytest = "^6.0.2"
 coverage = "^5.3"
-black = "^20.8b1"
+black = "^22.6.0"
 
 [tool.coverage.run]
 branch = true
