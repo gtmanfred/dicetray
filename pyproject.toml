@@ -22,7 +22,7 @@ sly = "^0.4"
 
 [tool.poetry.dev-dependencies]
 pytest = "^7.1.2"
-coverage = "^5.3"
+coverage = {extras = ["toml"], version = "^6.4.1"}
 black = "^22.6.0"
 
 [tool.coverage.run]
