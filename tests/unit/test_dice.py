@@ -79,7 +79,8 @@ def test_dice_str():
 
 
 @pytest.mark.parametrize(
-    'sides,result,ismin,ismax', [
+    'sides,result,ismin,ismax',
+    [
         (20, 10, False, False),
         (6, 1, True, False),
         (12, 12, False, True),

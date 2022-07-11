@@ -37,9 +37,9 @@ def test_dicetray_formulas(formula, num_dice):
     assert len(tray.dice) == num_dice
 
 
-
 @pytest.mark.parametrize(
-    'formula,max_dice', [
+    'formula,max_dice',
+    [
         ('100d20', 99),
         ('1001d20', None),
         ('50d20+100d6', 149),
@@ -54,7 +54,8 @@ def test_dicetray_maxdice_exception(formula, max_dice):
 
 
 @pytest.mark.parametrize(
-    'formula', [
+    'formula',
+    [
         ('1d20+'),
         ('1d10+-'),
         ('1dfF%20'),
