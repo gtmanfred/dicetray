@@ -30,10 +30,7 @@ class DiceParser(sly.Parser):
     def statements(self, p):
         return p.statement
 
-    @_("expr PLUS expr",
-       "expr MINUS expr",
-       "expr TIMES expr",
-       "expr DIVIDE expr")
+    @_("expr PLUS expr", "expr MINUS expr", "expr TIMES expr", "expr DIVIDE expr")
     def expr(self, p):
         return (self.ops[p[1]], p.expr0, p.expr1)
 

@@ -9,6 +9,7 @@ try:
     random = random.SystemRandom()
 except NotImplementedError:  # pragma: nocover
     import warnings
+
     warnings.warning(
         'System random number generator is not available. Falling back to pseudo-random generator'
     )
@@ -158,29 +159,35 @@ class Dicetray:
         if 'NUMBER' in tree:
             equation = str(tree['NUMBER'])
         elif 'KEEP' in tree:
-            kept = ', '.join([
-                f'**{die.result}**'
-                if self._highlight(die, markdown)
-                else str(die.result)
-                for die in tree['KEEP']
-            ])
-            dropped = ', '.join([
-                f'**{die.result}**'
-                if self._highlight(die, markdown)
-                else str(die.result)
-                for die in tree['DROP']
-            ])
+            kept = ', '.join(
+                [
+                    f'**{die.result}**'
+                    if self._highlight(die, markdown)
+                    else str(die.result)
+                    for die in tree['KEEP']
+                ]
+            )
+            dropped = ', '.join(
+                [
+                    f'**{die.result}**'
+                    if self._highlight(die, markdown)
+                    else str(die.result)
+                    for die in tree['DROP']
+                ]
+            )
             if verbose is True:
                 equation = f'{tree["FRAGMENT"]}(scores:[{kept}], dropped:[{dropped}])'
             else:
                 equation = kept
         elif 'DICE' in tree:
-            dice = ', '.join([
-                f'**{die.result}**'
-                if self._highlight(die, markdown)
-                else str(die.result)
-                for die in tree['DICE']
-            ])
+            dice = ', '.join(
+                [
+                    f'**{die.result}**'
+                    if self._highlight(die, markdown)
+                    else str(die.result)
+                    for die in tree['DICE']
+                ]
+            )
             if verbose is True:
                 equation = f'{tree["FRAGMENT"]}(scores:[{dice}])'
             else:
